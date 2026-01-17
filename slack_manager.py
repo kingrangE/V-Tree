@@ -3,7 +3,7 @@ from slack_bolt import App
 from slack_actions import SlackActions
 from datetime import datetime
 from repository.user_repository import UserRepository
-from repository.coin_condition_repository import CoinConditionRepository
+from repository.coin_alert_repository import CoinAlertRepository
 from typing import Optional
 
 class SlackAppManager:
@@ -13,7 +13,7 @@ class SlackAppManager:
             signing_secret=os.getenv("SIGNING_TOKEN")
         )
         self.user_db = UserRepository()
-        self.coin_condition_db = CoinConditionRepository()
+        self.coin_alert_db = CoinAlertRepository()
         self.actions = SlackActions()
         self._register_callbacks()
     def _register_callbacks(self):
@@ -23,15 +23,13 @@ class SlackAppManager:
             ack()
             self.actions.shortcut_view(trigger_id=shortcut["trigger_id"],callback_id=shortcut["callback_id"])
 
-        
-
         #특정 알림 삭제
         @self.__app.shortcut("delete_coin_alert")
         def handle_delete_coin_alert_shortcut(ack, shortcut):
             ack()
             options = []
             member_id=shortcut["user"]["id"]
-            current_conditions=list(self.coin_condition_db.get_user_condition(member_id=member_id))
+            current_conditions=list(self.coin_alert_db.get_user_condition(member_id=member_id))
             
             # 유저가 첫 이용이면 모달창 XX
             if self.__is_first(member_id= member_id, trigger_id= shortcut['trigger_id']): return 
@@ -54,7 +52,7 @@ class SlackAppManager:
         def handle_delete_all_coin_shortcut(ack, shortcut):
             ack()
             member_id=shortcut["user"]["id"]
-            current_conditions=self.coin_condition_db.get_user_condition(member_id=member_id)
+            current_conditions=self.coin_alert_db.get_user_condition(member_id=member_id)
             
             # 유저가 첫 이용이면 모달창 XX
             if self.__is_first(member_id= member_id, trigger_id= shortcut['trigger_id']): return 
@@ -80,7 +78,7 @@ class SlackAppManager:
                 return # 함수 종료
             
             # 알림 삽입
-            self.coin_condition_db.insert_user_condition(ticker=ticker,member_id=member_id,price=price)
+            self.coin_alert_db.insert_user_condition(ticker=ticker,member_id=member_id,price=price)
 
             # 유저 정보 없으면 유저 정보 삽입
             if not (self.user_db.find_user(member_id=member_id)) : # 없는 경우
@@ -98,7 +96,7 @@ class SlackAppManager:
             
             member_id = body["user"]["id"]
             
-            if self.coin_condition_db.delete_all_with_ids(member_id= member_id, ids= ids) :
+            if self.coin_alert_db.delete_all_with_ids(member_id= member_id, ids= ids) :
                 self.__alert_view(trigger_id=body["trigger_id"],title="알림 선택 삭제 완료",message=f"선택하신 알림이 모두 삭제 되었습니다.")
                 self.actions.send_message_to_user(memeber_id= member_id, message= "모두 삭제가 완료되었습니다.")
             else : 
@@ -110,7 +108,7 @@ class SlackAppManager:
             ack()
             member_id = body["user"]["id"]
             
-            if self.coin_condition_db.delete_all_bulk(member_id= member_id) :
+            if self.coin_alert_db.delete_all_bulk(member_id= member_id) :
                 self.__alert_view(trigger_id=body["trigger_id"],title="알림 선택 삭제 완료",message=f"선택하신 알림이 모두 삭제 되었습니다.")
                 self.actions.send_message_to_user(memeber_id= member_id, message= "모두 삭제가 완료되었습니다.")
             else : 

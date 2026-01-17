@@ -1,7 +1,7 @@
 from mongodb_connector import MongoDBConnector
 from datetime import datetime
 from bson.objectid import ObjectId
-class CoinConditionRepository:
+class CoinAlertRepository:
     def __init__(self):
         self.db = MongoDBConnector().get_db()
         self.collection = self.db['coin_condition']
