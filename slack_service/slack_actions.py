@@ -1,3 +1,7 @@
+"""
+slack 메시지 전송 및 modal view 
+"""
+
 import os
 from slack_sdk import WebClient
 import json

@@ -1,12 +1,12 @@
 from flask import Flask, request
 from slack_bolt.adapter.flask import SlackRequestHandler
 from dotenv import load_dotenv
-from slack_manager import SlackAppManager
+from slack_service.slack_shortcut_manager import SlackShortcutManager
 load_dotenv()
 
 flask_app = Flask(__name__)
 # Slack 앱 인스턴스 생성
-slack_manager = SlackAppManager()
+slack_manager = SlackShortcutManager()
 handler = SlackRequestHandler(slack_manager.get_app())
 
 

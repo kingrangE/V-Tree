@@ -5,17 +5,13 @@ from datetime import datetime
 from repository.user_repository import UserRepository
 from repository.coin_alert_repository import CoinAlertRepository
 from typing import Optional
+from slack_manager import SlackManager
 
-class SlackAppManager:
+class SlackShortcutManager(SlackManager):
     def __init__(self):        
-        self.__app = App(
-            token=os.getenv("OAUTH_TOKEN"),
-            signing_secret=os.getenv("SIGNING_TOKEN")
-        )
-        self.user_db = UserRepository()
-        self.coin_alert_db = CoinAlertRepository()
-        self.actions = SlackActions()
+        super().__init__()
         self._register_callbacks()
+        
     def _register_callbacks(self):
         # 알림 설정
         @self.__app.shortcut("coin_alert")
