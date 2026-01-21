@@ -46,11 +46,20 @@ class CoinAlertRepository:
         except Exception as e :
             print(f"[Error]({datetime.now().strftime("%Y-%m-%d %H:%M:%S")}) : {e}")
 
-    def update_last_triggered(self,member_id,id,time:float):
+    def update_last_triggered(self, member_id: str, ids: list[str], timestamp: float) -> bool:
+        """
+        조건 마지막 발동 시간 업데이트
+        """
         try:
-            self.collection.update_one({"member_id":member_id,"id":id},{"laste"})
+            for id in ids:
+                self.collection.update_one(
+                    {'_id': ObjectId(id), 'member_id': member_id},
+                    {'$set': {'last_triggered': timestamp}}
+                )
+            return True
         except Exception as e:
-            print(f"[Error]({datetime.now().strftime("%Y-%m-%d %H:%M:%S")}) : {e}")
+            print(f"[Error]({datetime.now().strftime('%Y-%m-%d %H:%M:%S')}) : {e}")
+            return False
     
 
     def delete_one(self,**kwargs)->bool:

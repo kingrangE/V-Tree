@@ -35,7 +35,7 @@ class SlackAlertManager(SlackManager):
                     current_price = self.coin_prices.get(ticker)
                     
                     # 조건 달성시, 알림 발송
-                    if current_price and current_price == target_price:
+                    if current_price and int(current_price) == int(target_price):
                         message = f"[Alert]({datetime.now().strftime('%d일 %H:%M:%S')}) 조건 만족 : {ticker} / 목표가: {target_price} (현재가: {current_price})"
                         await self.actions.send_message_to_user(member_id=condition['member_id'], message=message)
                         
