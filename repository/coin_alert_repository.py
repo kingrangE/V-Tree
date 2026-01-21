@@ -60,7 +60,6 @@ class CoinAlertRepository:
             print(f"[Error]({datetime.now().strftime('%Y-%m-%d %H:%M:%S')}) : {e}")
             return False
 
-
     def delete_one(self,**kwargs)->bool:
         """
         다양한 유형의 Option을 받아 해당 정보 1개 삭제(제일 처음 나온 기록 삭제)

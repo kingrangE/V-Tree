@@ -1,0 +1,98 @@
+{
+    "coin_alert":{
+        "type": "modal",
+        "callback_id": "coin_alert",
+        "title": {"type": "plain_text", "text": "알림 설정"},
+        "blocks": [
+            {
+                "type": "input",
+                "block_id": "Coin Ticker",
+                "element": {
+                    "type": "static_select",
+                    "action_id": "dropdown_option",
+                    "options": [
+                        {"text": {"type": "plain_text", "text": "비트코인"}, "value": "BTC/KRW"},
+                        {"text": {"type": "plain_text", "text": "이더리움"}, "value": "ETH/KRW"},
+                        {"text": {"type": "plain_text", "text": "리플"}, "value": "XRP/KRW"}
+                    ]
+                },
+                "label": {"type": "plain_text", "text": "알림 설정을 원하는 종목을 선택해주세요."}
+            },
+            {
+                "type": "input",
+                "label": {
+                    "type": "plain_text",
+                    "text": "금액 설정(숫자만)"
+                },
+                "element": {
+                    "type": "plain_text_input",
+                    "action_id": "Price",
+                    "placeholder": {
+                        "type": "plain_text",
+                        "text": "설정하고 싶은 금액을 입력해주세요."
+                    },
+                    "multiline": false
+                },
+                "optional": false
+            }
+        ],
+        "submit": {"type": "plain_text", "text": "제출"}
+    },
+    "delete_coin_alert":{
+        "type": "modal",
+        "callback_id": "delete_coin_alert",
+        "title": {"type": "plain_text", "text": "알림 삭제하기"},
+        "blocks": [
+                    {
+                    "type": "input",
+                    "block_id": "delete_block",
+                    "element": {
+                        "type": "multi_static_select",
+                        "placeholder": {
+                            "type": "plain_text",
+                            "text": "옵션을 선택하세요"
+                        },
+                        "action_id": "delete_list",
+                        "options": []
+                    },
+                    "label": {
+                        "type": "plain_text",
+                        "text": "삭제할 알림을 선택해주세요."
+                    }
+                }
+        ],
+        "submit": {"type": "plain_text", "text": "삭제"}
+    },
+    "delete_all_coin":{
+        "type": "modal",
+        "callback_id": "delete_all_coin",
+        "title": {"type": "plain_text", "text": "알림 삭제하기"},
+        "close": {"type": "plain_text", "text": "취소"}, 
+        "submit": {"type": "plain_text", "text": "확인"},
+        "blocks": [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "모든 코인 알림을 취소하시겠습니까?"
+                }
+            }
+        ]
+    },
+    "alert_message":{
+        "type": "modal",
+        "callback_id": "alert_message",
+        "title": {"type": "plain_text", "text": ""},
+        "close": {"type": "plain_text", "text": "취소"}, 
+        "submit": {"type": "plain_text", "text": "확인"},
+        "blocks": [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "모든 코인 알림을 취소하시겠습니까?"
+                }
+            }
+        ]
+    }
+}
