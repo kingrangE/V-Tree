@@ -1,18 +1,32 @@
-from flask import Flask, request
-from slack_bolt.adapter.flask import SlackRequestHandler
+import asyncio
+from contextlib import asynccontextmanager
+from fastapi import FastAPI, Request
+import uvicorn
+
+from slack_bolt.adapter.fastapi.async_handler import AsyncSlackRequestHandler
 from dotenv import load_dotenv
+
 from slack_service.slack_shortcut_manager import SlackShortcutManager
+from slack_service.slack_alert_manager import SlackAlertManager
+
 load_dotenv()
 
-flask_app = Flask(__name__)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # 서버 시작 시 실행
+    asyncio.create_task(alert_manager.send_alert_loop())
+    yield
+
+app = FastAPI(lifespan=lifespan)
+
 # Slack 앱 인스턴스 생성
-slack_manager = SlackShortcutManager()
-handler = SlackRequestHandler(slack_manager.get_app())
+shortcut_manager = SlackShortcutManager()
+alert_manager = SlackAlertManager()
+handler = AsyncSlackRequestHandler(shortcut_manager.app)
 
-
-@flask_app.route("/slack/events", methods=['POST'])
-def slack_events():
-    return handler.handle(request)
+@app.post("/slack/events")
+async def slack_events(request: Request):
+    return await handler.handle(request)
 
 if __name__ == "__main__":
-    flask_app.run(port=6764)
+    uvicorn.run(app, host="0.0.0.0", port=6764)
