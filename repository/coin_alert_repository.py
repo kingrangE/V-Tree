@@ -5,13 +5,7 @@ class CoinAlertRepository:
     def __init__(self):
         self.db = MongoDBConnector().get_db()
         self.collection = self.db['coin_condition']
-        
-    def get_user_condition(self,member_id:str):
-        try :
-            return self.collection.find({"member_id":member_id})
-        except Exception as e :
-            print(f"[Error]({datetime.now().strftime("%Y-%m-%d %H:%M:%S")}) : {e}")
-
+    
     def insert_user_condition(self,ticker:str,member_id:str,price:int,**kwargs):
         try :
             return self.collection.insert_one({
@@ -22,11 +16,42 @@ class CoinAlertRepository:
         except Exception as e :
             print(f"[Error]({datetime.now().strftime("%Y-%m-%d %H:%M:%S")}) : {e}")
 
-    def get_all_condition(self):
-        try:
-            return self.collection.find()
+    
+    def get_coins_symbols(self) -> list[str]:
+        """
+        User 전체가 알림 설정한 코인 목록 반환
+
+        return : List[str]
+        """
+        try : 
+            results:list[dict] = list(self.collection.find()) # 전체 결과 scrab
+            coins:set[str] = set()
+
+            for result in results :
+                coins.add(result["ticker"])
+            return list(coins)
+        except Exception as e :
+            print(e)
+            return set()
+
+    def get_user_conditions(self,member_id:str):
+        try :
+            return list(self.collection.find({"member_id":member_id}))
         except Exception as e :
             print(f"[Error]({datetime.now().strftime("%Y-%m-%d %H:%M:%S")}) : {e}")
+
+    def get_all_conditions(self):
+        try:
+            return list(self.collection.find())
+        except Exception as e :
+            print(f"[Error]({datetime.now().strftime("%Y-%m-%d %H:%M:%S")}) : {e}")
+
+    def update_last_triggered(self,member_id,id,time:float):
+        try:
+            self.collection.update_one({"member_id":member_id,"id":id},{"laste"})
+        except Exception as e:
+            print(f"[Error]({datetime.now().strftime("%Y-%m-%d %H:%M:%S")}) : {e}")
+    
 
     def delete_one(self,**kwargs)->bool:
         """
@@ -45,7 +70,7 @@ class CoinAlertRepository:
         except Exception as e:
             print(f"[Error]({datetime.now().strftime("%Y-%m-%d %H:%M:%S")}) : {e}")
 
-    def delete_all_bulk(self,member_id:str)->bool:
+    def delete_all_bulks(self,member_id:str)->bool:
         """
         Member의 모든 기록 삭제
         
@@ -75,9 +100,26 @@ class CoinAlertRepository:
             return True
         
         except Exception as e :
-            print(f"[Error]({datetime.now().strftime("%Y-%m-%d %H:%M:%S")}) : {e}")
+            print(f"[Error]({datetime.now().strftime('%Y-%m-%d %H:%M:%S')}) : {e}")
             return False
+
+    def update_last_triggered(self, member_id: str, ids: list[str], timestamp: float) -> bool:
+        """
+        조건 마지막 발동 시간 업데이트
+        """
+        try:
+            for id in ids:
+                self.collection.update_one(
+                    {'_id': ObjectId(id), 'member_id': member_id},
+                    {'$set': {'last_triggered': timestamp}}
+                )
+            return True
+        except Exception as e:
+            print(f"[Error]({datetime.now().strftime('%Y-%m-%d %H:%M:%S')}) : {e}")
+            return False
+
     
 
 if __name__ == "__main__":
-    repo = CoinConditionRepository()
+    repo = CoinAlertRepository()
+    repo.get_coins_symbols()
